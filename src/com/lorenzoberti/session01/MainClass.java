@@ -3,13 +3,12 @@
  */
 package com.lorenzoberti.session01;
 
-import net.finmath.montecarlo.BrownianMotion;
-
 /**
- * @author loren
+ * 
+ * @author Lorenzo Berti
  *
  */
-public class HelloWorld {
+public class MainClass {
 
 	/**
 	 * @param args
@@ -18,9 +17,8 @@ public class HelloWorld {
 		
 		
 		System.out.println("Hello World!"); 
+		System.out.println(System.getProperty("java.version"));
 		
-		BrownianMotion brownian;
-
 	}
 
 }
