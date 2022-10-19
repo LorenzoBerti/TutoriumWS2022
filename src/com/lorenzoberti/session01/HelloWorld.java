@@ -3,6 +3,8 @@
  */
 package com.lorenzoberti.session01;
 
+import net.finmath.montecarlo.BrownianMotion;
+
 /**
  * @author loren
  *
@@ -16,6 +18,8 @@ public class HelloWorld {
 		
 		
 		System.out.println("Hello World!"); 
+		
+		BrownianMotion brownian;
 
 	}
 
