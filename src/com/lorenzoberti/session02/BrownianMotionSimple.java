@@ -19,12 +19,12 @@ public class BrownianMotionSimple implements BrownianMotionInterface{
 	private int numberOfPaths; // the number of paths that you want to simulate
 	private int numberOfTimeSteps; // the number of time steps that you want to use
 	private double timeStep;  // the length of the time step
+	
 	private double wholePaths[][]; // a 2-dimensional array, namely a matrix, which will store all the realizations of the BM
 
 	// Constructor: this is used to construct the object when used. 
 	//Here an example of a possible constructor. Feel free to modify it if you prefer another implementation...
 	public BrownianMotionSimple(int numberOfPaths, int numberOfTimeSteps, double timeStep) {
-		super();
 		this.numberOfPaths = numberOfPaths;
 		this.numberOfTimeSteps = numberOfTimeSteps;
 		this.timeStep = timeStep;
