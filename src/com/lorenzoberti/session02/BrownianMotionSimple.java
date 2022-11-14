@@ -33,42 +33,76 @@ public class BrownianMotionSimple implements BrownianMotionInterface{
 	
 	@Override
 	public double[][] getPaths() {
-		// TODO Auto-generated method stub
-		return null;
+		// lazy inizialization: we inizialize it only one time
+		// but this is would not be a problem because everything is random
+		if (wholePaths == null) {
+			generate();
+		}
+		return wholePaths;
 	}
-
-
 
 	@Override
 	public double[] getProcessAtTimeIndex(int timeIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		if (wholePaths == null) {
+			generate();
+		}
+		double[] processAtGivenTime = new double[numberOfPaths];
+
+		for (int i = 0; i < numberOfPaths; i++) {
+			processAtGivenTime[i] = wholePaths[i][timeIndex];
+		}
+
+		return processAtGivenTime;
 	}
-
-
 
 	@Override
 	public double[] getSpecificPath(int path) {
-		// TODO Auto-generated method stub
-		return null;
+		if (wholePaths == null) {
+			generate();
+		}
+		double[] specificPath = new double[numberOfTimeSteps + 1];
+		
+		for (int i = 0; i < numberOfTimeSteps + 1; i++) {
+			specificPath[i] = wholePaths[path][i];
+		}
+			
+		return wholePaths[path];
 	}
-
-
 
 	@Override
-	public double getSpecificValue(int path, int timeIndex) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
-	
-	// Private! The user does not need this method: it is used only inside the class to create the Brownian motion
-	private void generate() {
-		// TODO Auto-generated method stub
-		
+	public double getSpecificValueAtTimeIndex(int path, int timeIndex) {
+		if (wholePaths == null) {
+			generate();
+		}
+		return wholePaths[path][timeIndex];
 	}
 
 	
+	// Private! The user does not need this method: it is inside the class
+	private void generate() {
+
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void printPath(int path) {
+
+		DoubleUnaryOperator trajectory = t -> {
+			return (getSpecificValueAtTimeIndex(path, (int) t));
+		};
+
+		Plot2D plot = new Plot2D(0, numberOfTimeSteps, numberOfTimeSteps + 1, trajectory);
+		plot.setTitle("Brownian motion path");
+		plot.setXAxisLabel("Time");
+		plot.setYAxisLabel("Brownian motion");
+		plot.show();
+
+	}
+
+
+	
+
 	
 	
 }

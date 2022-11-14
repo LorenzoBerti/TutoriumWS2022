@@ -3,6 +3,8 @@
  */
 package com.lorenzoberti.session02;
 
+import java.text.DecimalFormat;
+
 /**
  * Use this class to test your implementation of the BrownianMotionInterface.
  * 
@@ -10,8 +12,11 @@ package com.lorenzoberti.session02;
  *
  */
 public class BrownianMotionTest {
+	
+	static final DecimalFormat FORMATTERPOSITIVE = new DecimalFormat("0.0000");
+	static final DecimalFormat FORMATTERPERCENTAGE = new DecimalFormat("0.000%");
 
-		private static int numberOfPaths = 100000;
+		private static int numberOfPaths = 10000;
 		private static int numberOfTimeSteps = 100;
 		private static double timeStep = 1.0;
 
@@ -23,7 +28,7 @@ public class BrownianMotionTest {
 			// Create an object of type BrownianMotion
 			// replace the following line with the constructor of the Brownian motion
 			BrownianMotionInterface brownian = null;			
-			
+						
 			// Take the process at a given time
 			double[] process = null;
 
@@ -37,9 +42,10 @@ public class BrownianMotionTest {
 			double[] process2 = null;			
 			System.out.println("The covariance is: " + getCovariance(process, process2));
 
+
+
 		}
 
-		// This method return the average of a given array
 		private static double getAverage(double[] array) {
 
 			double sum = 0;
@@ -51,7 +57,6 @@ public class BrownianMotionTest {
 
 		}
 
-		// This method return the variance of a given array
 		private static double getVariance(double[] array) {
 
 			double sumSquared = 0;
@@ -64,7 +69,6 @@ public class BrownianMotionTest {
 			return variance;
 		}
 
-		// This method return the covariance between two given arrays
 		private static double getCovariance(double[] array1, double[] array2) {
 
 			double[] product = new double[array1.length];
