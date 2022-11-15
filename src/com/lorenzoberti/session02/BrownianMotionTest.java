@@ -16,7 +16,7 @@ public class BrownianMotionTest {
 	static final DecimalFormat FORMATTERPOSITIVE = new DecimalFormat("0.0000");
 	static final DecimalFormat FORMATTERPERCENTAGE = new DecimalFormat("0.000%");
 
-		private static int numberOfPaths = 10000;
+		private static int numberOfPaths = 100000;
 		private static int numberOfTimeSteps = 100;
 		private static double timeStep = 1.0;
 
@@ -27,10 +27,10 @@ public class BrownianMotionTest {
 
 			// Create an object of type BrownianMotion
 			// replace the following line with the constructor of the Brownian motion
-			BrownianMotionInterface brownian = null;			
+			BrownianMotionInterface brownian = new BrownianMotionSimple(numberOfPaths, numberOfTimeSteps, timeStep);			
 						
 			// Take the process at a given time
-			double[] process = null;
+			double[] process = brownian.getProcessAtTimeIndex(100);
 
 			// Check the average (it should be 0)
 			System.out.println("The average is: " + getAverage(process));
@@ -39,9 +39,10 @@ public class BrownianMotionTest {
 			System.out.println("The variance is: " + getVariance(process));
 
 			// Check the covariance between B(s) and B(t) (it should be min(s,t))
-			double[] process2 = null;			
+			double[] process2 = brownian.getProcessAtTimeIndex(5);			
 			System.out.println("The covariance is: " + getCovariance(process, process2));
 
+			brownian.printPath(5);
 
 
 		}

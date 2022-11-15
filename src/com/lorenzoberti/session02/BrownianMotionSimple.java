@@ -81,7 +81,28 @@ public class BrownianMotionSimple implements BrownianMotionInterface{
 	// Private! The user does not need this method: it is inside the class
 	private void generate() {
 
-		// TODO Auto-generated method stub
+		wholePaths = new double[numberOfPaths][numberOfTimeSteps + 1];
+		
+		// Java initialize the array with values = 0, so we do not need to initialize the Brownian motion at 0 by hand
+//		for(int i = 0; i < numberOfPaths; i++) {
+//			wholePaths[i][0] = 0;
+//		}
+		
+		// Random number generator
+		MersenneTwister mersenne = new MersenneTwister(3081);
+		
+		// now we generate the Brownian motion path by path
+		for(int pathIndex = 0; pathIndex < numberOfPaths; pathIndex++) {
+			for(int timeIndex = 1; timeIndex < numberOfTimeSteps+1; timeIndex++) {
+				// we have to generate the value drawing from the Normal distribution:
+				double random = mersenne.nextDouble(); // draw from uniform [0,1]
+				//double random = Math.random();
+				double normal = NormalDistribution.inverseCumulativeDistribution(random); // inverse cdf
+				wholePaths[pathIndex][timeIndex] = wholePaths[pathIndex][timeIndex-1] + Math.sqrt(timeStep)*normal; // Brownian motion
+				
+			}
+		}
+		
 
 	}
 
@@ -92,7 +113,7 @@ public class BrownianMotionSimple implements BrownianMotionInterface{
 			return (getSpecificValueAtTimeIndex(path, (int) t));
 		};
 
-		Plot2D plot = new Plot2D(0, numberOfTimeSteps, numberOfTimeSteps + 1, trajectory);
+		Plot2D plot = new Plot2D(0, numberOfTimeSteps, numberOfTimeSteps +1, trajectory);
 		plot.setTitle("Brownian motion path");
 		plot.setXAxisLabel("Time");
 		plot.setYAxisLabel("Brownian motion");
