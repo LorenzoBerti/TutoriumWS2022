@@ -43,26 +43,16 @@ public class ExchangeOptionPricing {
 		double riskFree = 0.05;
 		
 		double correlationFactor = 0.2;
-
-		// Since we want to use objects of type RandomVariable we need to create four no stochastic 
-		// random variables using the model parameter
-		// Note: a costant c can be seen as a trivial random variable X s.t. P(X = c) = 1, P(X != c) = 0
 		
 		
 		
 		
 		// Check: there exists an analytic formula for the exchange option that can be
 		// recovered through the change of measure...
-		double vol = firstAssetVolDouble * firstAssetVolDouble
-				- 2 * correlationFactor * firstAssetVolDouble * secondAssetVolDouble
-				+ secondAssetVolDouble * secondAssetVolDouble;
-
-		vol = Math.sqrt(Math.abs(vol));
 		
-		double analyticPrice = AnalyticFormulas.blackScholesOptionValue(firstAssetInitial, 0, vol, maturity,
-				secondAssetInitial);
+		
 
-		System.out.println("Analytic price is......: " + analyticPrice);
+		System.out.println("Analytic price is......: ");
 
 	}
 
