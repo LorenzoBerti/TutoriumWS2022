@@ -8,7 +8,6 @@ import net.finmath.functions.AnalyticFormulas;
 import net.finmath.functions.DoubleTernaryOperator;
 import net.finmath.montecarlo.BrownianMotion;
 import net.finmath.montecarlo.BrownianMotionFromMersenneRandomNumbers;
-import net.finmath.montecarlo.CorrelatedBrownianMotion;
 import net.finmath.montecarlo.RandomVariableFromDoubleArray;
 import net.finmath.montecarlo.assetderivativevaluation.MonteCarloAssetModel;
 import net.finmath.montecarlo.assetderivativevaluation.models.MultiAssetBlackScholesModel;
@@ -72,7 +71,7 @@ public class ExchangeOptionPricing {
 		TimeDiscretization times = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, deltaT);
 
 		// Constructor of our Brownian motion
-		BrownianMotionInterfaceEnhanced brownian = new BrownianMotionEnhanced(times, numberOfFactors, numberOfPaths);
+		BrownianMotionInterfaceEnhanced brownian = new BrownianMotionEnhanced(times, numberOfFactors, numberOfPaths, seed);
 		
 		// DoubleTernaryOperator (from the finmath-lib)
 		// x = Brownian motion at maturity, y = sigma, z = InitialValue
@@ -82,7 +81,7 @@ public class ExchangeOptionPricing {
 		
 		// First asset at maturity
 		RandomVariable firstBrownian = brownian.getBrownianMotionAtSpecificTime(0, maturity);
-		RandomVariable firstAsset = firstBrownian.apply(geometricBrownian, firstAssetVol, firstAssetInitialValue);
+		RandomVariable firstAsset = firstBrownian.apply(geometricBrownian, firstAssetVol, firstAssetInitialValue); //S^1(T)
 
 		// Second asset at maturity
 		RandomVariable secondBrownian = brownian.getBrownianMotionAtSpecificTime(1, maturity);
@@ -96,10 +95,10 @@ public class ExchangeOptionPricing {
 		double variance2 = correlatedBrownian.getVariance();
 		System.out.println("Correlation factor check...: "+ covariance/Math.sqrt(variance1*variance2));
 
-		RandomVariable secondAsset = correlatedBrownian.apply(geometricBrownian, secondAssetVol, secondAssetInitialValue);
+		RandomVariable secondAsset = correlatedBrownian.apply(geometricBrownian, secondAssetVol, secondAssetInitialValue); // S^2(T)
 		
 		// Note the methods of the RandomVariable interface!
-		double price = firstAsset.sub(secondAsset).floor(0.0).getAverage();
+		double price = firstAsset.sub(secondAsset).floor(0.0).getAverage(); // Monte Carlo price
 
 		// discounting...
 		price = price * Math.exp(-riskFree * maturity);

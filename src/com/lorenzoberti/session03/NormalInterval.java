@@ -29,8 +29,12 @@ public class NormalInterval implements ConfidenceInterval{
 	@Override
 	public double[] getConfidenceInterval(int numberOfSimulations, double level) {
 		
-		// Todo
-		return null;
+		double quantile = NormalDistribution.inverseCumulativeDistribution((1-level)/2);
+		double mean = randomVariable.getAverage();
+		double stdDeviation = Math.sqrt(randomVariable.getVariance());
+		
+		return new double[] { mean - quantile*stdDeviation/Math.sqrt(numberOfSimulations), 
+				mean + quantile*stdDeviation/Math.sqrt(numberOfSimulations)};
+		}
 	}
 
-}

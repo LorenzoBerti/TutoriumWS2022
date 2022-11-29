@@ -20,9 +20,9 @@ import net.finmath.time.TimeDiscretization;
 import net.finmath.time.TimeDiscretizationFromArray;
 
 /**
- * Use this class to price a call option with the object of type
+ * Use this class to price a call option with the objects of type
  * ProcessSimulation that you have created. Change the parameters (in particular
- * numberOfPaths, timeStep and maturity of the option) and try to understand the
+ * numberOfPaths, timeStep and maturity of the option) and try to explain the
  * behaviour of what you see.
  * 
  * @author Lorenzo Berti
@@ -56,13 +56,31 @@ public class CallTest {
 		double strike = 100.0;
 		double maturity = finalTime;
 
-		// Price with your Process simulator
+		// Price with our Process simulator
+		ProcessSimulator processEuler = new EulerSchemeBlackScholes(initialValue, riskFree, sigma, times,
+				numberOfPaths, seed);
 
-		System.out.println("Price with Euler scheme...: " );
+		RandomVariable lastValueEuler = processEuler.getProcessAtGivenTime(maturity);
+		
+		DoubleUnaryOperator payoff = x -> {
+			return Math.max(x - strike, 0);
+		};
+
+		double discountFactor = Math.exp(-riskFree * maturity);
+
+		double priceEuler = lastValueEuler.apply(payoff).mult(discountFactor).getAverage();
+
+		System.out.println("Price with Euler scheme...: " + priceEuler);
 		
 		// Finmath Lib price with Euler scheme
+		ProcessModel blackScholesModel = new BlackScholesModel(initialValue, riskFree, sigma);
+		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(times, 1, numberOfPaths, seed);
+		MonteCarloProcess process = new EulerSchemeFromProcessModel(blackScholesModel, brownianMotion);		
+		MonteCarloAssetModel blackScholesMonteCarloModel = new MonteCarloAssetModel(process);
+		EuropeanOption option = new EuropeanOption(maturity, strike);
+		double value = option.getValue(blackScholesMonteCarloModel);
 					
-		System.out.println("Finmath lib price.........: ");
+		System.out.println("Finmath lib price.........: "+ value);
 		
 		// Analytic price
 		double analyticPrice = AnalyticFormulas.blackScholesOptionValue(initialValue, riskFree, sigma, maturity,

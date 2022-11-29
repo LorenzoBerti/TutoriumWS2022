@@ -28,8 +28,10 @@ public class ChebyshevInterval implements ConfidenceInterval{
 	@Override
 	public double[] getConfidenceInterval(int numberOfSimulations, double level) {
 		
-		// Todo
-		return null;
+		double mean = randomVariable.getAverage();
+		double stdDeviation = Math.sqrt(randomVariable.getVariance());
+		
+		return new double[] {(mean-stdDeviation/Math.sqrt(numberOfSimulations*level)), mean+stdDeviation/Math.sqrt(numberOfSimulations*level)};
 	}
 
 }

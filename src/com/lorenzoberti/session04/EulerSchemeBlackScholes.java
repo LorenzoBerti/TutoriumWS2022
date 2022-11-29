@@ -23,54 +23,138 @@ import net.finmath.time.TimeDiscretization;
  */
 public class EulerSchemeBlackScholes implements ProcessSimulator {
 
+	private BrownianMotionInterfaceEnhanced brownian;
+	private double initialValue;
+	private double mu;
+	private double sigma;
+	private TimeDiscretization times;
+	private int numberOfPaths;
+
+	private RandomVariable[] allPaths;
+
+	public EulerSchemeBlackScholes(double initialValue, double mu, double sigma, TimeDiscretization times,
+			int numberOfPaths) {
+		super();
+		this.initialValue = initialValue;
+		this.mu = mu;
+		this.sigma = sigma;
+		this.times = times;
+		this.numberOfPaths = numberOfPaths;
+		this.brownian = new BrownianMotionEnhanced(times, 1, numberOfPaths);
+	}
+	
+	public EulerSchemeBlackScholes(double initialValue, double mu, double sigma, TimeDiscretization times,
+			int numberOfPaths, int seed) {
+		super();
+		this.initialValue = initialValue;
+		this.mu = mu;
+		this.sigma = sigma;
+		this.times = times;
+		this.numberOfPaths = numberOfPaths;
+		this.brownian = new BrownianMotionEnhanced(times, 1, numberOfPaths, seed);
+	}
+
+	public EulerSchemeBlackScholes(BrownianMotionInterfaceEnhanced brownian, double initialValue, double mu, double sigma) {
+		super();
+		this.brownian = brownian;
+		this.initialValue = initialValue;
+		this.mu = mu;
+		this.sigma = sigma;
+		this.times = brownian.getTimeDiscretization();
+	}
+
 	@Override
 	public double getInitialValue() {
-		// TODO Auto-generated method stub
-		return 0;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return initialValue;
 	}
 
 	@Override
 	public BrownianMotionInterfaceEnhanced getStochasticDriver() {
-		// TODO Auto-generated method stub
-		return null;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return brownian;
 	}
 
 	@Override
 	public RandomVariable getProcessAtGivenTimeIndex(int timeIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return allPaths[timeIndex];
 	}
 
 	@Override
 	public RandomVariable getProcessAtGivenTime(double time) {
-		// TODO Auto-generated method stub
-		return null;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return allPaths[times.getTimeIndex(time)];
 	}
 
 	@Override
 	public RandomVariable[] getAllPaths() {
-		// TODO Auto-generated method stub
-		return null;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return allPaths;
 	}
 
 	@Override
-	public double[] getSpecificPath(int pathIndex) {
-		// TODO Auto-generated method stub
-		return null;
+	public double[] getSpecificPath(int indexPath) {
+		if (allPaths == null) {
+			generate();
+		}
+
+		double[] path = new double[times.getNumberOfTimes() + 1];
+
+		path[0] = initialValue;
+
+		for (int i = 0; i < times.getNumberOfTimeSteps(); i++) {
+
+			path[i] = allPaths[i].get(indexPath);
+
+		}
+
+		return path;
 	}
+
 
 	@Override
 	public double getSpecificValueOfSpecificPath(int pathIndex, int timeIndex) {
-		// TODO Auto-generated method stub
-		return 0;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return getSpecificPath(pathIndex)[timeIndex];
 	}
 
 	@Override
 	public void printPath(int pathIndex) {
-		// TODO Auto-generated method stub
-		
+
+		DoubleUnaryOperator trajectory = t -> {
+			return getSpecificValueOfSpecificPath(pathIndex, (int) t);
+		};
+
+		Plot2D plot = new Plot2D(0, times.getNumberOfTimes(), times.getNumberOfTimes(), trajectory);
+		plot.setTitle("Simulated process path");
+		plot.setXAxisLabel("Time");
+		plot.setYAxisLabel("Process");
+		plot.show();
+
 	}
 
-	
+	private void generate() {
+
+
+	}
 	
 }

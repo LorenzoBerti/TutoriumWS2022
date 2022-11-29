@@ -132,7 +132,50 @@ public class BrownianMotionEnhanced implements BrownianMotionInterfaceEnhanced {
 
 	private void generate() {
 
-		// Todo
+		final int numberOfTimeSteps = times.getNumberOfTimeSteps();
+		// numberOfTimes = numberOfTimeSteps + 1
+		final int numberOfTimes = times.getNumberOfTimes();
+		
+		final double[][][] brownianIncrementsArray = new double[numberOfTimeSteps][numberOfFactors][numberOfPaths];
+		final double[][][] brownianPathsArray = new double[numberOfTimes][numberOfFactors][numberOfPaths];
+		
+		for(int pathIndex = 0; pathIndex < numberOfPaths; pathIndex++) {
+			for(int factorIndex = 0; factorIndex < numberOfFactors; factorIndex++) {
+				
+				brownianPathsArray[0][factorIndex][pathIndex] = 0.0;
+				
+				for(int timeIndex = 0; timeIndex < numberOfTimeSteps; timeIndex++) {
+					
+					double random = mersenne.nextDouble();
+					brownianIncrementsArray[timeIndex][factorIndex][pathIndex] = NormalDistribution
+							.inverseCumulativeDistribution(random) * Math.sqrt(times.getTimeStep(timeIndex)); // W(t_{i+1})-W(t_i)
+					brownianPathsArray[timeIndex+1][factorIndex][pathIndex] = brownianPathsArray[timeIndex][factorIndex][pathIndex] 
+							+ brownianIncrementsArray[timeIndex][factorIndex][pathIndex]; // W(t_{i+1}) = W(t_i) + W(t_{i+1})-W(t_i)
+				}
+				
+			}
+		}
+		
+		brownianIncrements = new RandomVariable[numberOfTimeSteps][numberOfFactors];
+		brownianPaths = new RandomVariable[numberOfTimeSteps + 1][numberOfFactors];
+		
+		for(int factorIndex = 0; factorIndex < numberOfFactors; factorIndex++) {
+			
+			brownianPaths[0][factorIndex] = new RandomVariableFromDoubleArray(times.getTime(0), 0);
+			
+			for(int timeIndex = 0; timeIndex < numberOfTimeSteps; timeIndex++) {
+				
+				brownianIncrements[timeIndex][factorIndex] = new RandomVariableFromDoubleArray(times.getTime(timeIndex), 
+						brownianIncrementsArray[timeIndex][factorIndex]);
+				brownianPaths[timeIndex+1][factorIndex] = new RandomVariableFromDoubleArray(times.getTime(timeIndex +1),
+						brownianPathsArray[timeIndex+1][factorIndex]);
+				
+			}
+		}
+		
+		
+		
+		
 
 }
 	
