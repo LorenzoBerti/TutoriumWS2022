@@ -37,23 +37,36 @@ public class TestProcess {
 		double sigma = 0.2;
 
 		// Write your constructors ("old" EulerSchemeBlackScholes, "new" BlackScholesEulerScheme)
-		
+		ProcessSimulator process = new EulerSchemeBlackScholes(brownian, initialValue, mu, sigma);
+		AbstractEulerScheme processNew = new BlackScholesEulerScheme(numberOfPaths, initialValue, times, mu, sigma);
+		AbstractEulerScheme processLog = new LogEulerBlackScholes(numberOfPaths, initialValue, times, mu, sigma);
 
 		// Take the average and the variance and print the values
+		RandomVariable lastValueOld = process.getProcessAtGivenTime(finalTime);
+		RandomVariable lastValueNew = processNew.getProcessAtGivenTime(finalTime);
+		RandomVariable lastValueLog = processLog.getProcessAtGivenTime(finalTime);
 
-		
-		System.out.println("The analytic average is...: " );
-		System.out.println("The old average is........: " );
-		System.out.println("The new average is........: " );
-		System.out.println("The log average is........: " );
+		double averageAnalytic = getAverageGeometricBM(initialValue, mu, finalTime);
+		double averageOld = lastValueOld.getAverage();
+		double averageNew = lastValueNew.getAverage();
+		double averageLog = lastValueLog.getAverage();
+
+		System.out.println("The analytic average is...: " + averageAnalytic);
+		System.out.println("The old average is........: " + averageOld);
+		System.out.println("The new average is........: " + averageNew);
+		System.out.println("The log average is........: " + averageLog);
 
 		System.out.println();
 
+		double varianceAnalytic = getVarianceGeometricBM(initialValue, mu, sigma, finalTime);
+		double varianceOld = lastValueOld.getVariance();
+		double varianceNew = lastValueNew.getVariance();
+		double varianceLog = lastValueLog.getVariance();
 
-		System.out.println("The analytic variance is..: ");
-		System.out.println("The old variance is.......: ");
-		System.out.println("The new variance is.......: ");
-		System.out.println("The log variance is.......: ");
+		System.out.println("The analytic variance is..: " + varianceAnalytic*100);
+		System.out.println("The old variance is.......: " + varianceOld);
+		System.out.println("The new variance is.......: " + varianceNew);
+		System.out.println("The log variance is.......: " + varianceLog);
 
 
 	}
@@ -63,7 +76,7 @@ public class TestProcess {
 	}
 	
 	private static double getVarianceGeometricBM(double initialValue, double mu, double sigma, double time) {
-		return initialValue*initialValue*Math.exp(2*mu*time)*(Math.exp(sigma*sigma*time)-1);
+		return initialValue*Math.exp(2*mu*time)*(Math.exp(sigma*sigma*time)-1);
 	}
 	
 

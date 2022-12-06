@@ -25,6 +25,7 @@ public abstract class AbstractEulerScheme implements ProcessSimulator {
 	private BrownianMotionInterfaceEnhanced brownian;
 	private double initialValue;
 	private TimeDiscretization times;
+	int numberOfSimulations;
 
 	private RandomVariable[] allPaths;
 
@@ -38,6 +39,12 @@ public abstract class AbstractEulerScheme implements ProcessSimulator {
 	protected DoubleUnaryOperator transform; // exp for logEuler
 	protected DoubleUnaryOperator inverseTransform;// log for logEuler
 
+	protected AbstractEulerScheme(int numberOfSimulations, double initialValue, TimeDiscretization times) {
+		this.initialValue = initialValue;
+		this.times = times;
+		this.numberOfSimulations = numberOfSimulations;
+		this.brownian = new BrownianMotionEnhanced(times, 1, numberOfSimulations);
+	}
 
 
 	@Override
@@ -45,57 +52,116 @@ public abstract class AbstractEulerScheme implements ProcessSimulator {
 
 		return initialValue;
 	}
+	
+	public int getNumberOfPaths() {
+		
+		return numberOfSimulations;
+	}
 
 	@Override
 	public BrownianMotionInterfaceEnhanced getStochasticDriver() {
 
-		return null;
+		return brownian;
 	}
 
 	public TimeDiscretization getTimeDiscretization() {
 
-		return null;
+		return times;
 	}
 
 	@Override
 	public RandomVariable getProcessAtGivenTimeIndex(int timeIndex) {
+		if (allPaths == null) {
+			generate();
+		}
 
-		return null;
+		return allPaths[timeIndex];
 	}
 
 	@Override
 	public RandomVariable getProcessAtGivenTime(double time) {
-	
-		return null;
+		if (allPaths == null) {
+			generate();
+		}
+
+		return allPaths[times.getTimeIndex(time)];
 	}
 
 	@Override
 	public RandomVariable[] getAllPaths() {
+		if (allPaths == null) {
+			generate();
+		}
 
-		return null;
+		return allPaths;
 	}
 
 	@Override
 	public double[] getSpecificPath(int indexPath) {
+		if (allPaths == null) {
+			generate();
+		}
 
-		return null;
+		double[] path = new double[times.getNumberOfTimes() + 1];
+
+		path[0] = initialValue;
+
+		for (int i = 0; i < times.getNumberOfTimeSteps(); i++) {
+
+			path[i] = allPaths[i].get(indexPath);
+
+		}
+
+		return path;
 	}
 	
 	@Override
 	public double getSpecificValueOfSpecificPath(int pathIndex, int timeIndex) {
+		if (allPaths == null) {
+			generate();
+		}
 
-		return 0;
+		return getSpecificPath(pathIndex)[timeIndex];
 	} 			
 
 	// This method generate the Euler scheme for a generical process
 	private void generate() {
 
+		RandomVariable drift;
+		RandomVariable diffusion;
+
+		allPaths = new RandomVariable[times.getNumberOfTimes()];
+
+		allPaths[0] = new RandomVariableFromDoubleArray(times.getTime(0), initialValue);
+
+		for (int timeIndex = 1; timeIndex < times.getNumberOfTimes(); timeIndex++) {
+
+			// Apply the inverse transform and do the Euler Scheme...
+			RandomVariable inverseOfLastSimulation = allPaths[timeIndex-1].apply(inverseTransform);
+			drift = getDrift(inverseOfLastSimulation, timeIndex-1);
+			diffusion = getDiffusion(inverseOfLastSimulation, timeIndex-1);
+			RandomVariable simulatedInverseTransform = inverseOfLastSimulation.add(drift).add(diffusion);
+			//...then transform back
+			allPaths[timeIndex] = simulatedInverseTransform.apply(transform);
+
+		}
 		
 	}
 
 	@Override
 	public void printPath(int pathIndex) {
 
+		DoubleUnaryOperator trajectory = t -> {
+			return getSpecificValueOfSpecificPath(pathIndex, (int) t);
+		};
+
+		Plot2D plot = new Plot2D(0, times.getNumberOfTimes(), times.getNumberOfTimes(), trajectory);
+		plot.setTitle("Simulated process path");
+		plot.setXAxisLabel("Time");
+		plot.setYAxisLabel("Process");
+		plot.show();
+
 	}
+	
 	
 }

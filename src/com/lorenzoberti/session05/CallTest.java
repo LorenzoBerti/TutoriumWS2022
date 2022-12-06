@@ -45,33 +45,75 @@ public class CallTest {
 
 		TimeDiscretization times = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, timeStep);
 
-		// Model parameter 
 		double initialValue = 100.0;
 		double riskFree = 0.1;
 		double sigma = 0.2;
 
-		// Option parameter 
 		double strike = 100.0;
 		double maturity = finalTime;
-		
+		double forward = initialValue * Math.exp(riskFree * maturity);
+		double payoffUnit = Math.exp(-riskFree * maturity);
 
-		// Write the constructors for the 3 process (BS Euler, BS LogEuler, Bachelier)...
+		AbstractEulerScheme processBS = new BlackScholesEulerScheme(numberOfPaths, initialValue, times, riskFree,
+				sigma);
+		AbstractEulerScheme processLogBS = new LogEulerBlackScholes(numberOfPaths, initialValue, times, riskFree,
+				sigma);
+		AbstractEulerScheme processBachelier = new BachelierEulerScheme(numberOfPaths, initialValue, times, riskFree,
+				sigma);
 
-		
-		// Take the processes at final time...
+		RandomVariable lastValueBS = processBS.getProcessAtGivenTime(finalTime);
+		RandomVariable lastValueLogBS = processLogBS.getProcessAtGivenTime(finalTime);
+		RandomVariable lastValueBachelier = processBachelier.getProcessAtGivenTime(finalTime);
 
-		
-		// Take the prices
+		DoubleUnaryOperator payoff = x -> {
+			return Math.max(x - strike, 0.0);
+		};
 
+		double priceBS = lastValueBS.apply(payoff).getAverage() * Math.exp(-riskFree * maturity);
+		double priceLogBS = lastValueLogBS.apply(payoff).getAverage() * Math.exp(-riskFree * maturity);
+		double priceBachelier = lastValueBachelier.apply(payoff).getAverage() * Math.exp(-riskFree * maturity);
+
+		double analyticPriceBS = AnalyticFormulas.blackScholesOptionValue(initialValue, riskFree, sigma, maturity,
+				strike);
+		double analyticPriceBachelier = AnalyticFormulas.bachelierOptionValue(forward, sigma, maturity, strike,
+				payoffUnit);
 		
-		// Take the Finmath Lib price with Euler scheme
+		// Finmath Lib price with Euler scheme
+		ProcessModel blackScholesModel = new BlackScholesModel(initialValue, riskFree, sigma);
+		BrownianMotion brownianMotion = new BrownianMotionFromMersenneRandomNumbers(times, 1, numberOfPaths, seed);
+		MonteCarloProcess process = new EulerSchemeFromProcessModel(blackScholesModel, brownianMotion);		
+		MonteCarloAssetModel blackScholesMonteCarloModel = new MonteCarloAssetModel(process);
+		EuropeanOption option = new EuropeanOption(maturity, strike);
+		double priceFin = option.getValue(blackScholesMonteCarloModel);
 		
+		System.out.println("\t\t\t  Price\t\tError");
+		System.out.println();
+		System.out.println(
+				"Analytic price BS.......: " + FORMATTERPOSITIVE.format(analyticPriceBS) + " \t"
+				+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceBS - analyticPriceBS) / analyticPriceBS));
+		System.out
+				.println("Euler BS process........: " + FORMATTERPOSITIVE.format(priceBS) + " \t"
+						+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceBS - priceBS) / analyticPriceBS));
+		System.out
+		.println("Euler LogBS process.....: " + FORMATTERPOSITIVE.format(priceLogBS) + " \t"
+				+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceBS - priceLogBS) / analyticPriceBS));
 		
-		// Analytic prices from the FinmathLib
+		System.out
+		.println("Finmath lib price.......: " + FORMATTERPOSITIVE.format(priceFin) + " \t"
+				+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceBS - priceFin) / analyticPriceBS));
 		
+		System.out.println();
 		
-		// Print and check....
-	
+		System.out.println(
+				"Analytic price Bachelier: " + FORMATTERPOSITIVE.format(analyticPriceBachelier) + " \t"
+				+ FORMATTERPERCENTAGE
+						.format(Math.abs(analyticPriceBachelier - analyticPriceBachelier) / analyticPriceBachelier));
+		System.out.println("Euler Bachelier process.: " + FORMATTERPOSITIVE.format(priceBachelier)
+				+ " \t"
+				+ FORMATTERPERCENTAGE
+						.format(Math.abs(analyticPriceBachelier - priceBachelier) / analyticPriceBachelier));
+
+
 	}
 	
 }

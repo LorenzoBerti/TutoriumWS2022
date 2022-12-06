@@ -65,18 +65,23 @@ public class EulerSchemeBlackScholes implements ProcessSimulator {
 
 	@Override
 	public double getInitialValue() {
-		if (allPaths == null) {
-			generate();
-		}
+//		if (allPaths == null) {
+//			generate();
+//		}
 
 		return initialValue;
+	}
+	
+	public int getNumberOfPaths() {
+		
+		return numberOfPaths;
 	}
 
 	@Override
 	public BrownianMotionInterfaceEnhanced getStochasticDriver() {
-		if (allPaths == null) {
-			generate();
-		}
+//		if (allPaths == null) {
+//			generate();
+//		}
 
 		return brownian;
 	}
@@ -153,8 +158,25 @@ public class EulerSchemeBlackScholes implements ProcessSimulator {
 	}
 
 	private void generate() {
+		
+		allPaths = new RandomVariable[times.getNumberOfTimes()];
+		
+		allPaths[0] = new RandomVariableFromDoubleArray(initialValue);
+		
+		for(int timeIndex = 0; timeIndex < times.getNumberOfTimes() - 1; timeIndex++) {
+			
+			RandomVariable drift = allPaths[timeIndex].mult(mu).mult(times.getTimeStep(timeIndex));
+			RandomVariable diffusion = allPaths[timeIndex].mult(sigma).mult(brownian.getBrownianIncrement(0, timeIndex));
+			
+			allPaths[timeIndex+1] = allPaths[timeIndex].add(drift).add(diffusion);
+			
+		}
 
 
 	}
+
+	
+
+	
 	
 }

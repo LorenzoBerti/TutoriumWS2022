@@ -33,18 +33,18 @@ public class ProcessTest {
 	 */
 	public static void main(String[] args) {
 
-		int numberOfPaths = 100000;
+		int numberOfPaths = 1000;
 		double initialTime = 0.0;
 		double finalTime = 1.0;
-		double timeStep = 0.01;
+		double timeStep = 1.0;
 		int numberOfTimeSteps = (int) (finalTime / timeStep);
 
 		TimeDiscretization times = new TimeDiscretizationFromArray(initialTime, numberOfTimeSteps, timeStep);
 
 		BrownianMotionInterfaceEnhanced brownian = new BrownianMotionEnhanced(times, 1, numberOfPaths);
 
-		double initialValue = 100.0;
-		double mu = 0.01;
+		double initialValue = 1.0;
+		double mu = 0.00;
 		double sigma = 0.2;
 
 		ProcessSimulator processEuler = new EulerSchemeBlackScholes(brownian, initialValue, mu, sigma);

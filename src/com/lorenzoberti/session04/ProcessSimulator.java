@@ -20,6 +20,13 @@ public interface ProcessSimulator {
 	 * @return initial value
 	 */
 	public double getInitialValue();
+	
+	/**
+	 * This method return the number of Monte Carlo simulations.
+	 * 
+	 * @return number of Monte Carlo simulations.
+	 */
+	public int getNumberOfPaths();
 
 	/**
 	 * This method returns the stochastic driver of our stochastic process, i.e. the
@@ -77,10 +84,10 @@ public interface ProcessSimulator {
 	public double getSpecificValueOfSpecificPath(int pathIndex, int timeIndex);
 
 	/**
-	 * This method print the given path of the simulated stochastic process
+	 * This method print the given path of the simulated stochastic process.
 	 * 
 	 * @param pathIndex
 	 */
 	public void printPath(int pathIndex);
-
+	
 }
