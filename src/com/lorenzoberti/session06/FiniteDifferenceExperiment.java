@@ -29,6 +29,10 @@ import net.finmath.time.TimeDiscretizationFromArray;
  * @author Lorenzo Berti
  *
  */
+/**
+ * @author Lorenzo Berti
+ *
+ */
 public class FiniteDifferenceExperiment {
 
 	/**
@@ -88,26 +92,21 @@ public class FiniteDifferenceExperiment {
 		checkDeltaApproximationMethods(model, maturity, payoffFunctionForward, valueDeltaForwardAnalytic);
 
 		System.out.println("\nEuropean Option:");
-		double valueDeltaAnalytic = AnalyticFormulas.blackScholesOptionDelta(initialValue, riskFreeRate, volatility, 
-				maturity, strike);
+		double valueDeltaAnalytic = AnalyticFormulas.blackScholesOptionDelta(initialValue, riskFreeRate, volatility, maturity, strike);
 		checkDeltaApproximationMethods(model, maturity, payoffFunctionOption, valueDeltaAnalytic);
 
 		System.out.println("\nDigital Option:");
-		double valueDeltaDigitalAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(initialValue, riskFreeRate, 
-				volatility, maturity, strike);
+		double valueDeltaDigitalAnalytic = AnalyticFormulas.blackScholesDigitalOptionDelta(initialValue, riskFreeRate, volatility, maturity, strike);
 		checkDeltaApproximationMethods(model, maturity, payoffFunctionDigital, valueDeltaDigitalAnalytic);
 
 
-		Plot2D plotForward = getPlotDeltaApproximationByShift(-13, -1, model, maturity, payoffFunctionForward, 
-				valueDeltaForwardAnalytic);
+		Plot2D plotForward = getPlotDeltaApproximationByShift(-13, -1, model, maturity, payoffFunctionForward, valueDeltaForwardAnalytic);
 		plotForward.setTitle("Finite Difference Approximation of Delta of a Forward (f(S(T) = S(T)-K)").show();
 
-		Plot2D plotEuropean = getPlotDeltaApproximationByShift(-13, -1, model, maturity, payoffFunctionOption, 
-				valueDeltaAnalytic);
+		Plot2D plotEuropean = getPlotDeltaApproximationByShift(-13, -1, model, maturity, payoffFunctionOption, valueDeltaAnalytic);
 		plotEuropean.setTitle("Finite Difference Approximation of Delta of a European Option (f(S(T) = max(S(T)-K,0))").show();
 
-		Plot2D plotDigital = getPlotDeltaApproximationByShift(-13, -1, model, maturity, payoffFunctionDigital, 
-				valueDeltaDigitalAnalytic);
+		Plot2D plotDigital = getPlotDeltaApproximationByShift(-13, -1, model, maturity, payoffFunctionDigital, valueDeltaDigitalAnalytic);
 		plotDigital.setTitle("Finite Difference Approximation of Delta of a Digital Option (f(S(T) = 1 for S(T) > K, otherwise 0)").show();
 
 		
@@ -126,24 +125,43 @@ public class FiniteDifferenceExperiment {
 		return price;
 	}
 	
-	private static double getDeltaCentralFiniteDifference(MonteCarloAssetModel model, double maturity, RandomOperator payoffFunction, 
-			double shift) throws CalculationException {
+	private static double getDeltaCentralFiniteDifference(MonteCarloAssetModel model, double maturity, RandomOperator payoffFunction, double shift) throws CalculationException {
 	
-			return 0;
+			double initialValue = model.getAssetValue(0.0, 0).doubleValue();
+
+			MonteCarloAssetModel modelUpShift = model.getCloneWithModifiedData(Map.of("initialValue", initialValue+shift));
+			double valueUpShift = getValueOfEuropeanProduct(modelUpShift, maturity, payoffFunction);
+
+			MonteCarloAssetModel modelDownShift = model.getCloneWithModifiedData(Map.of("initialValue", initialValue-shift));
+			double valueDnShift = getValueOfEuropeanProduct(modelDownShift, maturity, payoffFunction);
+
+			return (valueUpShift-valueDnShift)/(2*shift);
 		
 	}
 	
-	private static double getDeltaForwardFiniteDifference(MonteCarloAssetModel model, double maturity, 
-			RandomOperator payoffFunction, double shift) throws CalculationException {
+	private static double getDeltaForwardFiniteDifference(MonteCarloAssetModel model, double maturity, RandomOperator payoffFunction, double shift) throws CalculationException {
 		
-			return 0;
+		double initialValue = model.getAssetValue(0.0, 0).doubleValue();
+
+		MonteCarloAssetModel modelUpShift = model.getCloneWithModifiedData(Map.of("initialValue", initialValue+shift));
+		double valueUpShift = getValueOfEuropeanProduct(modelUpShift, maturity, payoffFunction);
+		
+		double value = getValueOfEuropeanProduct(model, maturity, payoffFunction);
+
+		return (valueUpShift-value)/(shift);
 	
 }
 	
-	private static double getDeltaBackwardFiniteDifference(MonteCarloAssetModel model, double maturity, 
-			RandomOperator payoffFunction, double shift) throws CalculationException {
+	private static double getDeltaBackwardFiniteDifference(MonteCarloAssetModel model, double maturity, RandomOperator payoffFunction, double shift) throws CalculationException {
 		
-			return 0;
+		double initialValue = model.getAssetValue(0.0, 0).doubleValue();
+
+		double value = getValueOfEuropeanProduct(model, maturity, payoffFunction);
+
+		MonteCarloAssetModel modelDownShift = model.getCloneWithModifiedData(Map.of("initialValue", initialValue-shift));
+		double valueDnShift = getValueOfEuropeanProduct(modelDownShift, maturity, payoffFunction);
+
+		return (value-valueDnShift)/(shift);
 	
 }
 	
@@ -170,8 +188,7 @@ public class FiniteDifferenceExperiment {
 
 	}
 	
-	private static Plot2D getPlotDeltaApproximationByShift(double xmin, double xmax, MonteCarloAssetModel model, 
-			double maturity, RandomOperator payoffFunction, double valueAnalytic) throws CalculationException {
+	private static Plot2D getPlotDeltaApproximationByShift(double xmin, double xmax, MonteCarloAssetModel model, double maturity, RandomOperator payoffFunction, double valueAnalytic) throws CalculationException {
 		double initialValue = model.getAssetValue(0.0, 0).doubleValue();
 
 		DoubleUnaryOperator finiteDifferenceApproximationByShift = scale -> {

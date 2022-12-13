@@ -26,7 +26,7 @@ public class BlackScholesEulerScheme extends AbstractEulerScheme {
 
 	public BlackScholesEulerScheme(int numberOfSimulations, double initialValue, TimeDiscretization times, double mu,
 			double sigma) {
-		super(numberOfSimulations, initialValue, times);
+		super( numberOfSimulations, initialValue, times);
 		this.mu = mu;
 		this.sigma = sigma;
 		this.transform = (x -> x);

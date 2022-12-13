@@ -35,7 +35,7 @@ public class CallTest {
 	 */
 	public static void main(String[] args) throws CalculationException {
 
-		int numberOfPaths = 100000;
+		int numberOfPaths = 10000;
 		int seed = 3031;
 		
 		double initialTime = 0.0;

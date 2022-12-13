@@ -32,7 +32,7 @@ public abstract class AbstractEulerScheme implements ProcessSimulator {
 	// This two method must be implemented by the specific class because they
 	// are specific of the dynamics of the process.
 	// Feel free to change the parameters if you need.
-	protected abstract RandomVariable getDrift(RandomVariable lastRealization, int timeIndex);
+	protected  abstract RandomVariable getDrift(RandomVariable lastRealization, int timeIndex);
 
 	protected abstract RandomVariable getDiffusion(RandomVariable lastRealization, int timeIndex);
 	
