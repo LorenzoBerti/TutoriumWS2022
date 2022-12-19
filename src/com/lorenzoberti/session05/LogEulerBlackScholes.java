@@ -53,6 +53,27 @@ public class LogEulerBlackScholes extends AbstractEulerScheme{
 		return brownianIncrement.mult(sigma);
 	}
 	
+	public double getMu() {
+		return mu;
+	}
+	
+	public double getSigma() {
+		return sigma;
+	}
+
+	@Override
+	public ProcessSimulator getCloneWithModifiedInitialValue(double newInitialValue) {
+
+		TimeDiscretization times = getTimeDiscretization();
+		int numberOfPaths = getNumberOfPaths();
+		double mu = getMu();
+		double sigma = getSigma();
+		return new  LogEulerBlackScholes(numberOfPaths, newInitialValue, times, mu, sigma);
+		
+	}
+
+
+	
 	
 
 

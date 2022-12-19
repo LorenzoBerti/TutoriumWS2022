@@ -3,8 +3,11 @@
  */
 package com.lorenzoberti.session07;
 
+import java.util.Map;
+
 import com.lorenzoberti.session04.ProcessSimulator;
 
+import net.finmath.montecarlo.assetderivativevaluation.MonteCarloAssetModel;
 import net.finmath.stochastic.RandomVariable;
 
 /**
@@ -16,28 +19,51 @@ import net.finmath.stochastic.RandomVariable;
  *
  */
 public class StraddleOption implements FinancialProductInterface{
+	
+	private double maturity;
+	private double strike;
+	private CallOption call;
+	private PutOption put;
+
+	public StraddleOption(double maturity, double strike) {
+		super();
+		this.maturity = maturity;
+		this.strike = strike;
+		this.call = new CallOption(maturity, strike);
+		this.put = new PutOption(maturity, strike);
+	}
 
 	@Override
 	public RandomVariable getPrice(ProcessSimulator process, RandomVariable discountFactor) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		RandomVariable callPrice = call.getPrice(process, discountFactor);
+		RandomVariable putPrice = put.getPrice(process, discountFactor);
+		return callPrice.add(putPrice).average();
 	}
 
 	@Override
 	public double getPriceAsDouble(ProcessSimulator process, RandomVariable discountFactor) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		return getPrice(process, discountFactor).getAverage();
 	}
-
-	@Override
+	
 	public double getDeltaCentralDifference(ProcessSimulator process, double shift, RandomVariable discountFactor) {
-		// TODO Auto-generated method stub
 		
-		// Hint: you can modify the ProcessSimulator interface and add an additional method...
+		double callDelta = call.getDeltaCentralDifference(process, shift, discountFactor);
+		double putDelta = put.getDeltaCentralDifference(process, shift, discountFactor);
 		
-		return 0;
+		return callDelta+putDelta;
+		
 	}
 	
-	
+	// This method allows us to print the payoff of the strategy as a function of
+	// the underlying value
+		public double getPayoffStrategy(double processValue) {
+
+			double callPayoff = Math.max(processValue - strike, 0);
+			double putPayoff = Math.max(strike - processValue, 0);
+			return (callPayoff + putPayoff);
+
+		}
 
 }

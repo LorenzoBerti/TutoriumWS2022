@@ -48,6 +48,26 @@ public class BlackScholesEulerScheme extends AbstractEulerScheme {
 		return lastRealization.mult(sigma).mult(brownianIncrement);
 	}
 	
+	public double getMu() {
+		return mu;
+	}
+	
+	public double getSigma() {
+		return sigma;
+	}
+	
+	@Override
+	public ProcessSimulator getCloneWithModifiedInitialValue(double newInitialValue) {
+		
+		TimeDiscretization times = getTimeDiscretization();
+		int numberOfPaths = getNumberOfPaths();
+		//System.out.println("NumberOfPaths: "+numberOfSimulations);
+		double mu = getMu();
+		double sigma = getSigma();
+		return new BlackScholesEulerScheme(numberOfPaths, newInitialValue, times, mu, sigma);
+	}
+
+	
 	
 	
 

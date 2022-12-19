@@ -174,6 +174,18 @@ public class EulerSchemeBlackScholes implements ProcessSimulator {
 
 
 	}
+	
+	@Override
+	public ProcessSimulator getCloneWithModifiedInitialValue(double newInitialValue) {
+		
+		int numberOfPaths = getNumberOfPaths();
+		TimeDiscretization times = getStochasticDriver().getTimeDiscretization();
+		
+		return new EulerSchemeBlackScholes(newInitialValue, mu, sigma, times,
+			numberOfPaths);
+	}
+
+	
 
 	
 

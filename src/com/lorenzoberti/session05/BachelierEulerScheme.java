@@ -54,6 +54,26 @@ public class BachelierEulerScheme extends AbstractEulerScheme {
 		return brownianIncrement.mult(sigma * Math.exp(-mu * (lastTime - currentTime)));
 	}
 	
+	
+	public double getMu() {
+		return mu;
+	}
+	
+	public double getSigma() {
+		return sigma;
+	}
+	
+	@Override
+	public ProcessSimulator getCloneWithModifiedInitialValue(double newInitialValue) {
+		
+		TimeDiscretization times = getTimeDiscretization();
+		int numberOfPaths = getNumberOfPaths();
+		double mu = getMu();
+		double sigma = getSigma();
+		return new BachelierEulerScheme(numberOfPaths, newInitialValue, times, mu, sigma);
+	}
+
+	
 
 	
 

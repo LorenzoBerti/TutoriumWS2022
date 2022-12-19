@@ -13,24 +13,50 @@ import net.finmath.stochastic.RandomVariable;
  * @author Lorenzo Berti
  *
  */
+/**
+ * @author Lorenzo Berti
+ *
+ */
 public class Caplet implements FinancialProductInterface {
+
+	private final double strike;
+	private final double notional;
+	private final double paymentDate;
+	private final double fixingDate;
+	private final double timeLength;
+
+	public Caplet(double fixingDate, double paymentDate, double strike, double notional) {
+		this.strike = strike;
+		this.notional = notional;
+		this.fixingDate = fixingDate;
+		this.paymentDate = paymentDate;
+		this.timeLength = paymentDate - fixingDate;
+	}
+	
 
 	@Override
 	public RandomVariable getPrice(ProcessSimulator process, RandomVariable discountFactor) {
-		// TODO Auto-generated method stub
-		return null;
+
+		RandomVariable payoff = process.getProcessAtGivenTime(fixingDate).sub(strike).floor(0.0);
+		RandomVariable price = payoff.mult(discountFactor).mult(timeLength).mult(notional);
+
+		return price.average();
 	}
 
 	@Override
 	public double getPriceAsDouble(ProcessSimulator process, RandomVariable discountFactor) {
-		// TODO Auto-generated method stub
-		return 0;
+
+		RandomVariable payoff = process.getProcessAtGivenTime(fixingDate).sub(strike).floor(0.0);
+		RandomVariable price = payoff.mult(discountFactor).mult(timeLength).mult(notional);
+
+		return price.getAverage();
 	}
+
 
 	@Override
 	public double getDeltaCentralDifference(ProcessSimulator process, double shift, RandomVariable discountFactor) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
+	
 }

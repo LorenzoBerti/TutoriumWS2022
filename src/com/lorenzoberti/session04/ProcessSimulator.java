@@ -90,4 +90,13 @@ public interface ProcessSimulator {
 	 */
 	public void printPath(int pathIndex);
 	
+	/**
+	 * This method return a clone of the process with another initial value.
+	 * 
+	 * @param newInitialValue
+	 * @return a new ProcessSimulator with a new initial value
+	 */
+	ProcessSimulator getCloneWithModifiedInitialValue(double newInitialValue);
+
+	
 }
