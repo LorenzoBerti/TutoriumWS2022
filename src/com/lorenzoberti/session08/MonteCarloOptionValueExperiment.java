@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.lorenzoberti.session07;
+package com.lorenzoberti.session08;
 
 
 import java.util.function.DoubleUnaryOperator;
