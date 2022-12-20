@@ -55,8 +55,14 @@ public class Caplet implements FinancialProductInterface {
 
 	@Override
 	public double getDeltaCentralDifference(ProcessSimulator process, double shift, RandomVariable discountFactor) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		double initialValue = process.getInitialValue();
+		ProcessSimulator  processUpShift = process.getCloneWithModifiedInitialValue(initialValue+shift);
+		ProcessSimulator processDownShift = process.getCloneWithModifiedInitialValue(initialValue-shift);
+		double capletUp = getPriceAsDouble(processUpShift, discountFactor);
+		double capletDown = getPriceAsDouble(processDownShift, discountFactor);
+		
+		return (capletUp-capletDown)/(2*shift);
 	}
 	
 }

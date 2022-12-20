@@ -85,8 +85,21 @@ public class MonteCarloOptionValueExperiment {
 	 */
 	private double getValueUsingStreams() {
 
+		DoubleUnaryOperator model = z -> initialValue * Math
+				.exp((riskFreeRate - volatility * volatility * 0.5) * maturity + volatility * Math.sqrt(maturity) * z);
 
-		return 0;
+		DoubleUnaryOperator payoff = s -> Math.max(s - strike, 0) * Math.exp(-riskFreeRate * maturity);
+
+		MersenneTwister mersenne = new MersenneTwister(seed);
+		DoubleStream uniform = DoubleStream.generate(mersenne).limit(numberOfSimulation);
+		DoubleStream normal = uniform.map(NormalDistribution::inverseCumulativeDistribution);
+
+		DoubleStream underlying = normal.map(model);
+		DoubleStream payoffStream = underlying.map(payoff);
+
+		double value = payoffStream.parallel().sum();
+
+		return value / numberOfSimulation;
 	}
 
 	/**
@@ -96,9 +109,21 @@ public class MonteCarloOptionValueExperiment {
 	 */
 	private double getValueUsingRandomVariable() {
 
+		MersenneTwister mersenne = new MersenneTwister(seed);
 
+		TimeDiscretization time = new TimeDiscretizationFromArray(0.0, 1.0, maturity);
 
-		return 0;
+		BrownianMotion brownian = new BrownianMotionFromRandomNumberGenerator(time, 1, numberOfSimulation, mersenne);
+
+		RandomVariable deltaW = brownian.getBrownianIncrement(0.0, 0);
+
+		double drift = (riskFreeRate - 0.5 * volatility * volatility) * maturity;
+		RandomVariable diffusion = deltaW.mult(volatility);
+		RandomVariable asset = diffusion.add(drift).exp().mult(initialValue);
+
+		RandomVariable payoff = asset.sub(strike).floor(0.0);
+
+		return payoff.getAverage() * Math.exp(-riskFreeRate * maturity);
 	}
 
 	/**
@@ -108,7 +133,22 @@ public class MonteCarloOptionValueExperiment {
 	 */
 	private double getValueUsingForLoop() {
 
-		return 0;
+		MersenneTwister mersenne = new MersenneTwister(seed);
+
+		double sum = 0.0;
+
+		for (int i = 0; i < numberOfSimulation; i++) {
+			double uniform = mersenne.nextDouble();
+			double normal = NormalDistribution.inverseCumulativeDistribution(uniform);
+			double asset = initialValue * Math.exp((riskFreeRate - volatility * volatility * 0.5) * maturity
+					+ normal * Math.sqrt(maturity) * volatility);
+			double payoff = Math.max(asset - strike, 0.0);
+
+			sum += payoff * Math.exp(-riskFreeRate * maturity);
+			;
+		}
+
+		return sum / numberOfSimulation;
 	}
 
 	/**
@@ -119,7 +159,8 @@ public class MonteCarloOptionValueExperiment {
 	 */
 	private double getAnalyticValue() {
 
-		return 0;
+		return AnalyticFormulas.blackScholesOptionValue(initialValue, riskFreeRate, volatility, maturity, strike);
 	}
+
 
 }

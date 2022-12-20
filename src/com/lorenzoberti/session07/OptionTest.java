@@ -129,7 +129,7 @@ public class OptionTest {
 				+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceCaplet - analyticPriceCaplet) / analyticPriceCaplet));
 		System.out.println("Euler BS process            : " + FORMATTERPOSITIVE.format(priceCapletEuler) + "        "
 				+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceCaplet - priceCapletEuler) / analyticPriceCaplet));
-		System.out.println("Analytic BS process         : " + FORMATTERPOSITIVE.format(priceCapletLogEuler) + "        "
+		System.out.println("LogEuler BS process         : " + FORMATTERPOSITIVE.format(priceCapletLogEuler) + "        "
 				+ FORMATTERPERCENTAGE.format(Math.abs(analyticPriceCaplet - priceCapletLogEuler) / analyticPriceCaplet));
 		
 

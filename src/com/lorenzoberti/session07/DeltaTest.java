@@ -116,12 +116,12 @@ public class DeltaTest {
 			return straddle.getPayoffStrategy(value);
 		};
 
-//		Plot2D plotStraddle = new Plot2D(0, 200, 200, straddlePayoff);
-//		plotStraddle.setTitle("Straddle strategy payoff");
-//		plotStraddle.setXAxisLabel("Stock price");
-//		plotStraddle.setYAxisLabel("Straddle payoff");
-//		plotStraddle.setYAxisNumberFormat(FORMATTERPOSITIVE);
-//		plotStraddle.show();
+		Plot2D plotStraddle = new Plot2D(0, 200, 200, straddlePayoff);
+		plotStraddle.setTitle("Straddle strategy payoff");
+		plotStraddle.setXAxisLabel("Stock price");
+		plotStraddle.setYAxisLabel("Straddle payoff");
+		plotStraddle.setYAxisNumberFormat(FORMATTERPOSITIVE);
+		plotStraddle.show();
 
 		// Straddle hedging strategy
 
