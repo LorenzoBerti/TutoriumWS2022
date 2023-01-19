@@ -18,6 +18,8 @@ import net.finmath.time.TimeDiscretization;
  * be generated in the same way, i.e. B(t_j) = B(t_{j-1}) + ΔB(t_j) but be
  * careful with the distribution of the Brownian increments...
  * 
+ * Something more...
+ * 
  * @author Lorenzo Berti
  *
  */

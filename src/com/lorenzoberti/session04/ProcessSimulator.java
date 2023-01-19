@@ -7,7 +7,8 @@ import net.finmath.stochastic.RandomVariable;
 
 /**
 * This interface describes the methods of the simulation of a generic Ito
-* process, i.e. dX(t) = mu(t,X(t)) dt + sigma(t,X(t)) dW(t).
+* process, i.e. dX(t) = mu(t,X(t)) dt + sigma(t,X(t)) dW(t). 
+* Something more...
 * 
 * @author Lorenzo Berti
 *
