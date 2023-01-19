@@ -21,10 +21,6 @@ public class MainClass {
 		
 		// something else
 
-		// something different
-
-		// we add something here
-
 	
 	}
 
