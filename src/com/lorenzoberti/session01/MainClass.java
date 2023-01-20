@@ -19,7 +19,6 @@ public class MainClass {
 		System.out.println("Hello World!"); 
 		System.out.println(System.getProperty("java.version"));
 		
-		// add something
 		// new line 
 		// something different
 
