@@ -9,6 +9,7 @@ import net.finmath.time.TimeDiscretization;
 /**
 * This class implements the methods getDrift and getDiffusion for the
 * Black-Scholes model.
+*
 * 
 * @author Lorenzo Berti
 *
